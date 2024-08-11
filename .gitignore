@@ -1,0 +1,42 @@
+# Node.js modules and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend build and cache files
+frontend/build/
+frontend/.pnp
+frontend/.pnp.js
+frontend/node_modules/
+frontend/coverage/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Backend build and cache files
+backend/build/
+backend/.pnp
+backend/.pnp.js
+backend/node_modules/
+backend/coverage/
+backend/.env.local
+backend/.env.development.local
+backend/.env.test.local
+backend/.env.production.local
+
+# Miscellaneous
+.DS_Store
+
+# Ignore any logs
+*.log
+
+# Ignore compiled files
+*.out
+*.exe
+*.o
+
+
+node_modules
+.env

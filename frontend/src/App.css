@@ -1,0 +1,621 @@
+.container {
+  display: flex;
+}
+
+.left-half {
+  width: 50%;
+  padding: 20px;
+}
+
+.right-half {
+  width: 50%;
+  padding: 20px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.file-name-input {
+  flex: 1;
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.language-dropdown {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.run-button {
+  padding: 5px 10px;
+}
+
+.text-editor {
+  width: 100%;
+  height: 500px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.input-output-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-area {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.output-area {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  overflow: auto;
+}
+
+/* src/App.css */
+.login-container {
+  width: 300px;
+  margin: 100px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container form div {
+  margin-bottom: 15px;
+}
+
+.login-container form label {
+  margin-bottom: 5px;
+}
+
+.login-container form input {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container form button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-container form button:hover {
+  background-color: #0056b3;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.App {
+  display: flex;
+}
+
+.sidebar {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  padding-top: 20px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 8px;
+  text-align: center;
+}
+
+.sidebar ul li a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+}
+
+.sidebar ul li a:hover {
+  background-color: #575757;
+}
+
+.content {
+  margin-left: 220px; /* Same as the width of the sidebar + some extra space */
+  padding: 20px;
+}
+
+form {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+div {
+  margin-bottom: 10px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.question, .test-case {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
+
+.test-case {
+  margin-left: 20px;
+}
+
+/* styles.css */
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 100px;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 10px 0;
+  cursor: pointer;
+  padding: 10px;
+  transition: background-color 0.3s;
+}
+
+.sidebar li:hover {
+  background-color: #575757;
+}
+
+.main-content {
+  margin-left: 200px;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.test-form {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test-form h2 {
+  margin-top: 0;
+}
+
+/* In App.css */
+.success-message {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.tests-page {
+  padding: 20px;
+}
+
+.tests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.test-box {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: calc(33.333% - 20px); /* Adjust this value based on your layout */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test-box h3 {
+  margin-top: 0;
+}
+
+.test-box p {
+  margin-bottom: 0;
+}
+
+/* App.css */
+
+/* Style for the problems page */
+.problems-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.problems-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.problems-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.problems-page th, .problems-page td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.problems-page th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.problems-page tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.problems-page tr:hover {
+  background-color: #f1f1f1;
+}
+
+.problems-page a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.problems-page a:hover {
+  text-decoration: underline;
+}
+
+.problems-page p {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+}
+
+/* App.css */
+
+.coding-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.problem-details {
+  margin-bottom: 20px;
+}
+
+.sample-test-case {
+  margin-top: 10px;
+}
+
+.code-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+}
+
+.text-editor {
+  width: 100%;
+  height: 300px;
+  margin-top: 10px;
+}
+
+.input-output-container {
+  display: flex;
+  margin-top: 10px;
+}
+
+.input-area {
+  width: 50%;
+  height: 100px;
+  margin-right: 10px;
+}
+
+.output-area {
+  width: 50%;
+  height: 100px;
+  background-color: #f1f1f1;
+  padding: 10px;
+}
+
+.output-area pre {
+  margin: 0;
+}
+/* App.css */
+
+.container {
+  display: flex;
+}
+
+.left-half {
+  flex: 1;
+  padding: 20px;
+}
+
+.right-half {
+  flex: 1;
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.text-editor, .input-area {
+  width: 100%;
+  height: 150px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.output-area {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.file-name-input, .language-dropdown, .run-button {
+  margin-right: 10px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+}
+
+.input-output-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-area, .output-area {
+  width: 48%;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.left-half, .right-half {
+  flex: 1;
+  padding: 20px;
+}
+
+.left-half {
+  border-right: 1px solid #ccc;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.file-name-input {
+  margin-right: 10px;
+}
+
+.language-dropdown {
+  margin-right: 10px;
+}
+
+.run-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.run-button:hover {
+  background-color: #45a049;
+}
+
+.text-editor {
+  width: 100%;
+  height: 500px;
+  margin-bottom: 10px;
+}
+
+.input-output-container {
+  display: flex;
+}
+
+.input-area {
+  width: 50%;
+  height: 100px;
+  margin-right: 10px;
+}
+
+.output-area {
+  width: 50%;
+  height: 100px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.not-passed {
+  color: red;
+}
+
+.passed {
+  color: green;
+}
+
+.username
+{
+  margin-left: 300px;
+}
+
+/* App.css */
+.app-container {
+  display: flex;
+}
+
+.sidebar {
+  position: fixed;
+  width: 200px;
+  height: 100vh;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  margin-left: 300px; /* Adjust based on sidebar width */
+  padding: 20px;
+  width: calc(100% - 200px);
+}
+
+/* Full screen for CodeSpace */
+.full-screen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.view-code-page {
+  margin: 20px auto;
+  max-width: 800px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.view-code-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.view-code-page p {
+  font-size: 16px;
+  color: #555;
+}
+
+.code-block {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #272822;
+  color: #f8f8f2;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.datetime {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
