@@ -20,7 +20,8 @@ const userSchema = new mongoose.Schema({
   },
   displayName: String,
   email: String,
-  role: String
+  role: String,
+  rollno:String,
 });
 
 // No need to add a custom 'id' field since '_id' is automatically generated and unique

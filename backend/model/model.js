@@ -4,23 +4,27 @@ const primaryConnection = mongoose.createConnection(process.env.MONGO_URI2);
 
 const questionSchema = new mongoose.Schema({
   questionId: String,
-  title : String,
+  title: String,
   description: String,
-sampleTestCase : String,
+  sampleTestCase: String,
   numberOfTestCases: Number,
   testCases: [
     {
-      inputs: [String],  // Array of strings for multiple inputs in each test case
-      outputs: [String],// Array of strings for multiple outputs in each test case 
+      inputs: [String],
+      outputs: [String],
     },
   ],
 });
-  const testSchema = new mongoose.Schema({
-    customId: String,
-    topic: String,
-    
-    questions: [questionSchema],
-  });
+
+const testSchema = new mongoose.Schema({
+  customId: String,
+  topic: String,
+  questionsToAttend: Number, // New field
+  fromTime: Date, // New field
+  toTime: Date, // New field
+  questions: [questionSchema],
+});
+
 
 
 

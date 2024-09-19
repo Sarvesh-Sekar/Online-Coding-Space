@@ -30,10 +30,11 @@ const UserSideBar = ({ onLogout }) => {
     <div className="sidebar">
       <ul>
         <li><Link to="/home">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-        <li><Link to="/services">Services</Link></li>
         
-        <li><Link to="/tests">Tests</Link></li> {/* New Link */}
+        <li><Link to="/upcoming">Upcoming Tests</Link></li>
+        
+        <li><Link to="/tests">OnGoing</Link></li> {/* New Link */}
+        <li><Link to="/attended">Attended</Link></li>
       </ul>
       <button onClick={handleLogout}>Logout</button>
     </div>

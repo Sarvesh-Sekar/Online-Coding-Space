@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import AdminDashboard from './AdminDashboard';
-import UserDashboard from './UserDashboard';
+import AdminDashboard from './AdminPage';
+import UserDashboard from './UserPage';
 
 const Protected = () => {
   const [message, setMessage] = useState('');

@@ -1,24 +1,11 @@
-// src/AdminDashboard.js
-import React from 'react';
-import UserSideBar from './UserSideBar';
+import React from 'react'
 
-
-
-
-
-function UserDashboard({ onLogout }) {
- 
-
-
+const UserDashboard = () => {
   return (
     <div>
-     
-
-     <UserSideBar></UserSideBar>
-
-    
+       <h1>User Dashboard</h1>
     </div>
-  );
+  )
 }
 
-export default UserDashboard;
+export default UserDashboard

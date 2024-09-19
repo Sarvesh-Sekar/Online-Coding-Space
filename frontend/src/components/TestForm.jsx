@@ -7,6 +7,9 @@ const TestForm = () => {
   const [formData, setFormData] = useState({
     topic: '',
     numberOfQuestions: 0,
+    questionsToAttend: 0, // New field
+    fromTime: '', // New field
+    toTime: '', // New field
     questions: [],
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -130,6 +133,9 @@ const TestForm = () => {
       const response = await axios.post('http://localhost:5000/tests', {
         topic: formData.topic,
         questions: formData.questions,
+        questionsToAttend: formData.questionsToAttend, // Posting the new field
+        fromTime: formData.fromTime, // Posting the new field
+        toTime: formData.toTime, // Posting the new field
       });
       console.log('Form Data Submitted:', response.data);
       setIsSubmitted(true);
@@ -138,6 +144,9 @@ const TestForm = () => {
         setFormData({
           topic: '',
           numberOfQuestions: 0,
+          questionsToAttend: 0,
+          fromTime: '',
+          toTime: '',
           questions: [],
         });
       }, 2000);
@@ -160,6 +169,42 @@ const TestForm = () => {
               type="text"
               name="topic"
               value={formData.topic}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Number of Questions:</label>
+            <input
+              type="number"
+              name="numberOfQuestions"
+              value={formData.numberOfQuestions}
+              onChange={handleNumberOfQuestionsChange}
+            />
+          </div>
+          <div>
+            <label>Number of Questions to Attend:</label>
+            <input
+              type="number"
+              name="questionsToAttend"
+              value={formData.questionsToAttend}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>From Time:</label>
+            <input
+              type="datetime-local"
+              name="fromTime"
+              value={formData.fromTime}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>To Time:</label>
+            <input
+              type="datetime-local"
+              name="toTime"
+              value={formData.toTime}
               onChange={handleChange}
             />
           </div>

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "backend": "file:",
     "body-parser": "^1.20.2",
     "compile-run": "^2.3.4",
     "connect-mongo": "^5.1.0",

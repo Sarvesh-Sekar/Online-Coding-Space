@@ -619,3 +619,137 @@ th {
   justify-content: space-between;
   margin-bottom: 10px;
 }
+
+/* InstructionsPage.jsx*/
+/* App.css */
+
+.instructions-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full screen height */
+  padding: 20px;
+  background-color: #f5f5f5; /* Background color */
+}
+
+.instructions-list {
+  margin-top: 20px;
+}
+
+.instruction-item {
+  margin-bottom: 10px;
+}
+
+.start-button {
+  margin-top: 30px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.start-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* css for next button*/
+/* Common button styles */
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+/* Enabled button styles */
+button:not([disabled]) {
+  background-color: #007bff;
+  color: white;
+}
+
+button:not([disabled]):hover {
+  background-color: #0056b3;
+}
+
+/* Disabled button styles */
+button:disabled {
+  background-color: #e0e0e0;
+  color: #a9a9a9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button:disabled:hover {
+  background-color: #e0e0e0;
+}
+
+
+/* css updated in CodeSpace*/
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.left-half {
+  width: 50%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.right-half {
+  width: 50%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.timer {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background-color: #282c34;
+  color: #61dafb;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 18px;
+  z-index: 1000;
+}
+
+.language-selection,
+.output-section,
+textarea {
+  margin-top: 20px;
+}
+
+.passed {
+  color: green;
+}
+
+.not-passed {
+  color: red;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+h2, h3, p {
+  margin: 10px 0;
+}

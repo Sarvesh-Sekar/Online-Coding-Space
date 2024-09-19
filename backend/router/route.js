@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose');
 const fs = require('fs/promises');
 const User = require('../model/User')
-
+const { ObjectId } = mongoose.Types;
 const path = require('path')
 //const { c , cpp , python ,java ,node} = require('compile-run')
 const Test = require('../model/model')
@@ -35,26 +36,33 @@ router.post('/run', async (req, res) => {
 });
   
   
-  router.post('/tests', async (req, res) => {
-    const { topic, questions } = req.body;
+router.post('/tests', async (req, res) => {
+  const { topic, questions, questionsToAttend, fromTime, toTime } = req.body;
 
-    try {
-        const topicPrefix = topic.substring(0, 2).toUpperCase();
-        const topicId = generateCustomId(topicPrefix, 1); // Generating the custom ID for the topic
+  try {
+      const topicPrefix = topic.substring(0, 2).toUpperCase();
+      const topicId = generateCustomId(topicPrefix, 1);
 
-        // Generate unique IDs for each question
-        const updatedQuestions = questions.map((question, index) => {
-            const questionId = generateCustomId(topicPrefix, index + 1, true);
-            return { ...question, questionId };
-        });
+      const updatedQuestions = questions.map((question, index) => {
+          const questionId = generateCustomId(topicPrefix, index + 1, true);
+          return { ...question, questionId };
+      });
 
-        const newTest = new Test({ customId: topicId, topic, questions: updatedQuestions });
-        await newTest.save();
-        res.status(201).send({ success: true }); // Send a proper JSON response
-    } catch (error) {
-        console.error('Error saving test:', error); // Log the error for debugging
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
+      const newTest = new Test({
+          customId: topicId,
+          topic,
+          questionsToAttend, // Save the new field
+          fromTime, // Save the new field
+          toTime, // Save the new field
+          questions: updatedQuestions,
+      });
+
+      await newTest.save();
+      res.status(201).send({ success: true });
+  } catch (error) {
+      console.error('Error saving test:', error);
+      res.status(500).send({ error: 'Internal Server Error' });
+  }
 });
 
 
@@ -88,103 +96,170 @@ router.get('/api/tests', async (req, res) => {
   });
   
 
-  router.get('/api/tests/:customId/questions/:questionId', async (req, res) => {
-    const { customId, questionId } = req.params;
-
-    console.log(`Received request to fetch question with ID: ${questionId} from test with custom ID: ${customId}`);
+  // Route to fetch a random question ID for a given test
+  router.get('/api/tests/:customId/questions/random', async (req, res) => {
+    const { customId } = req.params;
+    const excludedId = req.query.excludedId; // Get the excluded ID from the query parameters
   
     try {
-        // Find the test by customId
-        const test = await Test.findOne({ customId }).populate('questions');
-        
-        if (!test) {
-            console.log('Test not found');
-            return res.status(404).json({ message: 'Test not found' });
-        }
-
-        console.log(`Test found: ${test}`);
-
-        // Find the question within the test
-        const question = test.questions.find(q => q.questionId.toString() === questionId);
-        
-        if (!question) {
-            console.log('Question not found in this test');
-            return res.status(404).json({ message: 'Question not found in this test' });
-        }
-
-        console.log(`Question found: ${question}`);
-
-        // Send the question details
-        res.json({
-            title: question.title,
-            description: question.description,
-            sampleTestCase: question.sampleTestCase,  
-            numberOfTestCases: question.numberOfTestCases
-        });
-
+      // Find the test by customId
+      const test = await Test.findOne({ customId }).populate('questions');
+  
+      if (!test) {
+        return res.status(404).json({ message: 'Test not found' });
+      }
+  
+      if (!test.questions || test.questions.length === 0) {
+        return res.status(404).json({ message: 'No questions found in this test' });
+      }
+  
+      // Filter out already fetched questions and the excluded question
+      const availableQuestions = test.questions.filter(question => 
+        question._id.toString() !== excludedId
+      );
+  
+      if (availableQuestions.length === 0) {
+        return res.status(404).json({ message: 'No more unique questions available' });
+      }
+  
+      // Get a random question from the available ones
+      const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+      const question = availableQuestions[randomIndex];
+  
+      res.status(200).json({
+        questionId: question._id,
+        title: question.title,
+        description: question.description,
+        sampleTestCase: question.sampleTestCase,
+        numberOfTestCases: question.testCases.length
+      });
     } catch (error) {
-        console.error('Error fetching question', error);
-        res.status(500).json({ message: 'Error fetching question', error });
+      console.error('Error fetching random question:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-});
-
-
+  });
+  
+  
   
 
-router.post('/submit/:customId/:problemId', async (req, res) => {
-  const { customId, problemId } = req.params;
-  const { language, code, fileName } = req.body;
-
+router.get('/api/tests/:customId', async (req, res) => {
   try {
-    const testDoc = await Test.findOne({ customId: customId });
-    if (!testDoc) {
-      return res.status(404).send('Test not found');
+    const { customId } = req.params;
+    const test = await Test.findOne({ customId });
+
+    if (!test) {
+      return res.status(404).json({ error: 'Test not found' });
     }
 
-    const problem = testDoc.questions.find(q => q.questionId === problemId);
-    if (!problem) {
-      return res.status(404).send('Problem not found');
-    }
-
-    const { testCases } = problem;
-    let results = [];
-    let firstTestCaseOutput = ''; // Variable to store the first test case output
-
-    for (let i = 0; i < testCases.length; i++) {
-      const testCase = testCases[i];
-      const combinedInput = testCase.inputs.join(' ');
-      const combinedOutput = testCase.outputs.join(' ').replace(/\r?\n|\r/g, "");
-
-      try {
-        const result = await runCode(language, code, fileName, combinedInput);
-        const cleanedResult = result.replace(/\r?\n|\r/g, "");
-
-        if (i === 0) {
-          firstTestCaseOutput = cleanedResult; // Capture the first test case output
-        }
-
-        if (cleanedResult === combinedOutput) {
-          results.push({ testCase: i + 1, status: 'Passed' });
-        } else {
-          results.push({ testCase: i + 1, status: 'Failed' });
-        }
-      } catch (error) {
-        console.error('Error during code execution:', error);
-        results.push({ testCase: i + 1, status: 'Failed due to execution error' });
-      }
-    }
-
-    const passedCount = results.filter(result => result.status === 'Passed').length;
-    const overallResult = results.map(result => `Test Case ${result.testCase} ${result.status}`).join('\n');
-
-    res.json({ passedCount, results, overallResult, firstTestCaseOutput });
+    res.json({ topic: test.topic, numQuestions: test.questionsToAttend });
   } catch (error) {
-    console.error('Error processing submission:', error);
-    res.status(500).send('Internal server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+  // router.get('/api/tests/:customId/questions/:questionId', async (req, res) => {
+  //   const { customId, questionId } = req.params;
+  
+  //   console.log(`Received request to fetch question with ID: ${questionId} from test with custom ID: ${customId}`);
+  
+  //   try {
+  //     // Find the test by customId
+  //     const test = await Test.findOne({ customId }).populate('questions');
+  
+  //     if (!test) {
+  //       console.log('Test not found');
+  //       return res.status(404).json({ message: 'Test not found' });
+  //     }
+  
+  //     //console.log(`Test found: ${test}`);
+  
+  //     // Find the question within the test
+  //     const question = test.questions.find((q) => q.questionId.toString() === questionId);
+  
+  //     if (!question) {
+  //       console.log('Question not found in this test');
+  //       return res.status(404).json({ message: 'Question not found in this test' });
+  //     }
+  
+  //     console.log(`Question found: ${question}`);
+  
+  //     // Send the question details
+  //     res.json({
+  //       title: question.title,
+  //       description: question.description,
+  //       sampleTestCase: question.sampleTestCase,
+  //       numberOfTestCases: question.numberOfTestCases,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error fetching question', error);
+  //     res.status(500).json({ message: 'Error fetching question', error });
+  //   }
+  // });
 
+  
+
+  router.post('/submit/:customId/:problemId', async (req, res) => {
+    const { customId, problemId } = req.params;
+    const { language, code, fileName } = req.body;
+  
+    // Validate ObjectId format
+    console.log(problemId)
+  
+    try {
+      const testDoc = await Test.findOne({ customId: customId });
+      if (!testDoc) {
+        return res.status(404).send('Test not found');
+      }
+  
+      // Convert the problemId in the params to an ObjectId
+     //const problemObjectId = new ObjectId(problemId);
+  
+      // Compare with the ObjectId of the questions
+      const problem = testDoc.questions.find(q => q._id.equals(problemId) || q.questionId===problemId);
+      
+      if (!problem) {
+        return res.status(404).send('Problem not found');
+      }
+  
+      const { testCases } = problem;
+      let results = [];
+      let firstTestCaseOutput = ''; // Variable to store the first test case output
+  
+      for (let i = 0; i < testCases.length; i++) {
+        const testCase = testCases[i];
+        const combinedInput = testCase.inputs.join(' ');
+        const combinedOutput = testCase.outputs.join(' ').replace(/\r?\n|\r/g, "");
+  
+        try {
+          const result = await runCode(language, code, fileName, combinedInput);
+          const cleanedResult = result.replace(/\r?\n|\r/g, "");
+  
+          if (i === 0) {
+            firstTestCaseOutput = cleanedResult; // Capture the first test case output
+          }
+  
+          if (cleanedResult === combinedOutput) {
+            results.push({ testCase: i + 1, status: 'Passed' });
+           
+          } else {
+            results.push({ testCase: i + 1, status: 'Failed' });
+          }
+        } catch (error) {
+          console.error('Error during code execution:', error);
+          results.push({ testCase: i + 1, status: 'Failed due to execution error' });
+        }
+      }
+     
+      const passedCount = results.filter(result => result.status === 'Passed').length;
+      const overallResult = results.map(result => `Test Case ${result.testCase} ${result.status}`).join('\n');
+      console.log(passedCount)
+      res.json({ passedCount, results, overallResult, firstTestCaseOutput });
+    } catch (error) {
+      console.error('Error processing submission:', error);
+      res.status(500).send('Internal server error');
+    }
+  });
+  
 
 
 
@@ -290,7 +365,7 @@ router.get('/api/users/me', (req, res) => {
   
 router.post('/finish/:userId/:customId/:problemId', async (req, res) => {
   const { userId, customId, problemId } = req.params;
-  const { language, code, filename } = req.body;
+  const { language, code, filename, completed } = req.body;
 
   try {
     const testDoc = await Test.findOne({ customId });
@@ -298,52 +373,85 @@ router.post('/finish/:userId/:customId/:problemId', async (req, res) => {
       return res.status(404).send('Test not found');
     }
 
-    const problem = testDoc.questions.find(q => q.questionId === problemId);
+    const problem = testDoc.questions.find(q => q._id.equals(problemId) || q.questionId === problemId);
     if (!problem) {
       return res.status(404).send('Problem not found');
     }
 
-    const { testCases } = problem;
-    let passedCount = 0;
-
-    for (let i = 0; i < testCases.length; i++) {
-      const testCase = testCases[i];
-      const combinedInput = testCase.inputs.join(' ');
-      const expectedOutput = testCase.outputs.join(' ').replace(/\r?\n|\r/g, "");
-
-      try {
-        const result = await runCode(language, code, filename, combinedInput);
-        const cleanedResult = result.replace(/\r?\n|\r/g, "");
-
-        if (cleanedResult === expectedOutput) {
-          passedCount++;
-        }
-      } catch (error) {
-        console.error('Error during code execution:', error);
-      }
-    }
-
-    const completed = passedCount === testCases.length;
     const submissionTime = new Date().toISOString();
 
-    const historyEntry = new History({
-      userId,
+    // Find or create history entry
+    let historyEntry = await History.findOne({ userId, topicId: customId });
+
+    if (!historyEntry) {
+      historyEntry = new History({
+        userId,
+        topicId: customId,
+        questionToAnswer: testDoc.questionsToAttend,
+        questionCompleted: 0,
+        questionsSubmitted: []
+      });
+    }
+
+    // Add the current question submission
+    historyEntry.questionsSubmitted.push({
       problemId,
       code,
       filename,
       language,
       submittedTime: submissionTime,
-      completed,
+      completed
     });
+
+    // If the question is fully completed, increment the questionCompleted count
+    if (completed) {
+      historyEntry.questionCompleted += 1;
+    }
+
+    // Check if all required questions are completed
+    if (historyEntry.questionCompleted >= historyEntry.questionToAnswer) {
+      historyEntry.testStatus = true;
+      historyEntry.testCompletedTime = new Date().toISOString();
+      await historyEntry.save();
+
+      // All questions completed, return completed status as true
+      return res.json({ completed: true });
+    }
 
     await historyEntry.save();
 
-    res.status(201).json({ message: 'Submission recorded', completed });
+    // If not all questions completed, return the next question
+    if (completed) {
+      const availableQuestions = testDoc.questions
+        .filter(q => !q._id.equals(problemId)) // Exclude the current question
+        .map(q => q);
+
+      if (availableQuestions.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+        const nextQuestion = availableQuestions[randomIndex];
+
+        return res.json({
+          completed: false,
+          nextQuestion: {
+            questionId: nextQuestion._id,
+            title: nextQuestion.title,
+            description: nextQuestion.description,
+            sampleTestCase: nextQuestion.sampleTestCase,
+            numberOfTestCases: nextQuestion.testCases.length
+          }
+        });
+      }
+    }
+
+    // If no more questions available, return completed
+    res.status(201).json({ message: 'Submission recorded', completed: false });
   } catch (error) {
     console.error('Error processing finish:', error);
     res.status(500).send('Internal server error');
   }
 });
+
+
 
 router.get('/api/history/:userId/:problemId', async (req, res) => {
   const { userId, problemId } = req.params;
@@ -460,7 +568,50 @@ router.get('/api/code/:userId/:problemId', async (req, res) => {
   }
 });
 
+router.get('/history/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(userId)
 
+    // Fetch the test history for the given user ID
+    const userHistory = await History.find({ userId });
+    
+
+    // If no history is found, return an empty array
+    if (!userHistory || userHistory.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Return the user's test history
+    res.status(200).json(userHistory);
+  } catch (err) {
+    console.error('Error fetching user history:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//time
+router.get('/time/tests/:customId', async (req, res) => {
+  const { customId } = req.params;
+
+  try {
+    // Attempt to find the test data by customId
+    const test = await Test.findOne({ customId });
+
+    if (test) {
+      // If the test is found, send it as a JSON response
+      res.json(test);
+    } else {
+      // If the test is not found, respond with a 404 error
+      res.status(404).json({ error: 'Test not found' });
+    }
+  } catch (error) {
+    // Catch any errors that occur during the database operation and respond with a 500 error
+    console.error('Error fetching test:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the test data' });
+  }
+});
 module.exports = router;
 
 

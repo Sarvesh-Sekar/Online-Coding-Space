@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { cpp } from '@codemirror/lang-cpp';
+import { oneDark } from '@codemirror/theme-one-dark';
 import '../App.css';
 
 function CodeSpace() {
-  const { customId, problemId, userId } = useParams();
+  const { customId, userId } = useParams();
   const navigate = useNavigate();
   const [language, setLanguage] = useState('.js');
   const [output, setOutput] = useState('');
@@ -15,35 +21,97 @@ function CodeSpace() {
     '.py': '',
     '.java': '',
     '.cpp': '',
-    '.c': ''
+    '.c': '',
   });
-  const [problemDetails, setProblemDetails] = useState({
-    title: '',
-    description: '',
-    sampleTestCase: '',
-    numberOfTestCases: 0,
-    testCases: []
-  });
+  const [problemDetails, setProblemDetails] = useState({});
   const [testCaseStatus, setTestCaseStatus] = useState([]);
-  const [firstTestCaseOutput, setFirstTestCaseOutput] = useState('');
+  const [canProceedToNext, setCanProceedToNext] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
-    document.getElementById('editor').value = code[language];
-  }, [language, code]);
-
-  useEffect(() => {
-    const fetchProblemDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/tests/${customId}/questions/${problemId}`);
-        setProblemDetails(response.data);
-        setTestCaseStatus(Array(response.data.numberOfTestCases).fill('Not Passed'));
-      } catch (error) {
-        console.error('Error fetching problem details:', error);
+    const fetchQuestionDetails = async () => {
+      const storedQuestion = localStorage.getItem('currentQuestion');
+      if (storedQuestion) {
+        const questionData = JSON.parse(storedQuestion);
+        setProblemDetails(questionData);
+        setTestCaseStatus(Array(questionData.numberOfTestCases).fill('Not Passed'));
+      } else {
+        await fetchRandomQuestion();
       }
     };
 
-    fetchProblemDetails();
-  }, [customId, problemId]);
+    const fetchTimer = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/time/tests/${customId}`);
+        const { toTime } = response.data;
+        if (toTime) {
+          setTimer(toTime);
+        } else {
+          console.error('Invalid toTime received:', toTime);
+        }
+      } catch (error) {
+        console.error('Error fetching timer:', error);
+      }
+    };
+
+    fetchQuestionDetails();
+    fetchTimer();
+
+    return () => clearInterval(timerInterval);
+  }, [customId]);
+
+  let timerInterval = null;
+
+  const setTimer = (endTime) => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const end = new Date(endTime);
+
+      if (isNaN(end.getTime())) {
+        console.error('Invalid endTime format:', endTime);
+        setTimeLeft('00:00');
+        return;
+      }
+
+      const difference = end - now;
+
+      if (difference <= 0) {
+        clearInterval(timerInterval);
+        setTimeLeft('00:00');
+        return;
+      }
+
+      const minutes = Math.floor(difference / 60000);
+      const seconds = Math.floor((difference % 60000) / 1000);
+      setTimeLeft(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+    };
+
+    timerInterval = setInterval(calculateTimeLeft, 1000);
+  };
+
+  const fetchRandomQuestion = async (excludedId = null) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/tests/${customId}/questions/random`, {
+        params: { excludedId },
+      });
+      const { questionId, title, description, sampleTestCase, numberOfTestCases } = response.data;
+
+      const newProblemDetails = {
+        questionId,
+        title,
+        description,
+        sampleTestCase,
+        numberOfTestCases
+      };
+
+      setProblemDetails(newProblemDetails);
+      setTestCaseStatus(Array(numberOfTestCases).fill('Not Passed'));
+
+      localStorage.setItem('currentQuestion', JSON.stringify(newProblemDetails));
+    } catch (error) {
+      console.error('Error fetching random question:', error);
+    }
+  };
 
   const runCode = async () => {
     const currentCode = code[language];
@@ -74,25 +142,26 @@ function CodeSpace() {
     setInput(event.target.value);
   };
 
-  const handleCodeChange = (event) => {
-    const newCode = event.target.value;
+  const handleCodeChange = (value) => {
     setCode(prevCode => ({
       ...prevCode,
-      [language]: newCode
+      [language]: value
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`http://localhost:5000/submit/${customId}/${problemId}`, {
+      const response = await axios.post(`http://localhost:5000/submit/${customId}/${problemDetails.questionId}`, {
         language,
         code: code[language],
         fileName
       });
 
-      const results = response.data.results;
+      const { passedCount, results, firstTestCaseOutput } = response.data;
+      const allPassed = results.every(result => result.status === 'Passed');
       setTestCaseStatus(results.map(result => result.status));
-      setFirstTestCaseOutput(response.data.firstTestCaseOutput);
+      setCanProceedToNext(allPassed);
+
       setOutput(firstTestCaseOutput);
     } catch (error) {
       console.error('Error submitting code:', error.response || error.message);
@@ -101,27 +170,75 @@ function CodeSpace() {
   };
 
   const handleFinish = async () => {
-    const confirmation = window.confirm('Would you like to finish?');
-    if (confirmation) {
-      try {
-        const response = await axios.post(`http://localhost:5000/finish/${userId}/${customId}/${problemId}`, {
-          language,
-          code: code[language],
-          filename: fileName // Ensure this matches the backend route
-        });
-
-        alert('Submission successful!');
-        // Redirect to the ProblemsPage after successful submission
-        navigate(`/tests/${customId}/questions/${userId}`); // Adjust the route if necessary
-      } catch (error) {
-        console.error('Error submitting:', error.response || error.message);
-        alert('Error submitting.');
+    const allTestCasesPassed = testCaseStatus.every(status => status === 'Passed');
+  
+    // If not all test cases are passed
+    if (!allTestCasesPassed) {
+      const confirmation = window.confirm('Not all test cases are passed. Would you like to end the test and submit this question?');
+  
+      if (confirmation) {
+        // Submit as incomplete and navigate to Attended
+        try {
+          await axios.post(`http://localhost:5000/finish/${userId}/${customId}/${problemDetails.questionId}`, {
+            language,
+            code: code[language],
+            filename: fileName,
+            completed: false // Explicitly send that this question is not completed
+          });
+  
+          // Directly navigate to the Attended page
+          navigate(`/attended`);
+        } catch (error) {
+          console.error('Error submitting incomplete question:', error.response || error.message);
+          alert('Error submitting incomplete question.');
+        }
       }
+      return; // Stop further processing
     }
+  
+    // If all test cases passed
+    try {
+      const response = await axios.post(`http://localhost:5000/finish/${userId}/${customId}/${problemDetails.questionId}`, {
+        language,
+        code: code[language],
+        filename: fileName,
+        completed: true // Send completion status as true
+      });
+  
+      const { completed, nextQuestion } = response.data;
+  
+      // If all required questions are completed, navigate to Attended
+      if (completed) {
+        navigate(`/attended`);
+      } else if (nextQuestion) {
+        // Load the next question if there are still questions to complete
+        setProblemDetails(nextQuestion);
+        setTestCaseStatus(Array(nextQuestion.numberOfTestCases).fill('Not Passed'));
+        localStorage.setItem('currentQuestion', JSON.stringify(nextQuestion));
+      }
+    } catch (error) {
+      console.error('Error submitting completed question:', error.response || error.message);
+      alert('Error submitting.');
+    }
+  };
+  
+  
+  
+  
+
+  const languageMode = {
+    '.js': javascript(),
+    '.py': python(),
+    '.java': java(),
+    '.cpp': cpp(),
+    '.c': cpp(),
   };
 
   return (
     <div className="container">
+      <div className="timer">
+        <h3>Time Left: {timeLeft || 'Loading...'}</h3>
+      </div>
       <div className="left-half">
         <h2>{problemDetails.title}</h2>
         <p>{problemDetails.description}</p>
@@ -149,52 +266,43 @@ function CodeSpace() {
         </table>
       </div>
       <div className="right-half">
-        <div className="top-bar">
-          <input
-            type="text"
-            className="file-name-input"
-            placeholder="File Name"
-            value={fileName}
-            onChange={handleFileNameChange}
-          />
-          <select
-            className="language-dropdown"
-            value={language}
-            onChange={handleLanguageChange}
-          >
+        <h3>Code Editor</h3>
+        <div className="language-selection">
+          <label>Select Language:</label>
+          <select value={language} onChange={handleLanguageChange}>
             <option value=".js">JavaScript</option>
             <option value=".py">Python</option>
             <option value=".java">Java</option>
             <option value=".cpp">C++</option>
             <option value=".c">C</option>
           </select>
-          <button className="run-button" onClick={runCode}>
-            Run Code
-          </button>
-          <button className="submit-button" onClick={handleSubmit}>
-            Submit
-          </button>
         </div>
-        <textarea
-          id="editor"
-          className="text-editor"
-          placeholder="Type your code here..."
-          onChange={handleCodeChange}
-        ></textarea>
-        <div className="input-output-container">
-          <textarea
-            className="input-area"
-            placeholder="Type your input here..."
-            value={input}
-            onChange={handleInputChange}
-          ></textarea>
-          <div className="output-area">
-            <pre>{output}</pre>
-          </div>
+        <div>
+          <label>File Name:</label>
+          <input type="text" value={fileName} onChange={handleFileNameChange} placeholder="Enter file name" />
         </div>
-        <button className="finish-button" onClick={handleFinish}>
-          Finish
-        </button>
+        <div>
+          <CodeMirror
+            value={code[language]}
+            height="200px"
+            extensions={[languageMode[language]]}
+            theme={oneDark}
+            onChange={handleCodeChange}
+          />
+        </div>
+        <div>
+          <label>Input:</label>
+          <textarea value={input} onChange={handleInputChange} placeholder="Enter input" />
+        </div>
+        <div>
+          <button onClick={runCode}>Run Code</button>
+          <button onClick={handleSubmit}>Submit Code</button>
+          <button onClick={handleFinish}>Finish</button>
+        </div>
+        <div className="output-section">
+          <h3>Output</h3>
+          <pre>{output}</pre>
+        </div>
       </div>
     </div>
   );
