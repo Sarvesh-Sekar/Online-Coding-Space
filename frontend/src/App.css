@@ -753,3 +753,486 @@ th, td {
 h2, h3, p {
   margin: 10px 0;
 }
+
+/*DashboardUser.jsx*/
+.dashboard-container {
+  display: flex;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.dashboard-section-container {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-section-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.test-count {
+  font-size: 16px;
+  color: #666;
+}
+
+p {
+  font-size: 16px;
+}
+
+
+/* AttendedTests.jsx*/
+
+.attended-tests-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.attended-tests-content {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+.test-container {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.test-container h3 {
+  margin-bottom: 10px;
+}
+
+.test-container p {
+  margin: 5px 0;
+}
+
+/* ViewCode.jsx*/
+.view-code-page {
+  padding: 20px;
+}
+
+.submission-details p {
+  margin: 0;
+  padding: 5px 0;
+}
+
+.code-block {
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+}
+
+/*ViewCode.jsx*/
+.view-code-page {
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 800px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.view-code-page h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.datetime {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.datetime p {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+}
+
+.code-block {
+  background-color: #282c34;
+  color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  white-space: pre-wrap; /* Preserves formatting and breaks lines */
+  word-wrap: break-word; /* Allows breaking long code lines */
+  overflow-x: auto; /* Horizontal scroll for long lines */
+  border: 1px solid #ccc;
+}
+
+.code-block::-webkit-scrollbar {
+  height: 10px;
+}
+
+.code-block::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.code-block::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.code-block::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.loading,
+.error-message {
+  text-align: center;
+  font-size: 18px;
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.error-message {
+  color: #ff4d4d;
+}
+
+/*UpdateDetails.jsx*/
+
+/* General container styles */
+.update-details-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #2c3e50;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 15px 0;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.sidebar ul li a:hover {
+  color: #3498db;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sidebar button:hover {
+  background-color: #c0392b;
+}
+
+/* Main content area */
+.update-details-content {
+  margin-left: 270px; /* To ensure it doesn't overlap with the sidebar */
+  padding: 40px;
+  width: 100%;
+}
+
+.update-details-content h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Form styles */
+form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+form label {
+  font-weight: bold;
+  color: #34495e;
+}
+
+form input, form select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+form button {
+  width: 100%;
+  background-color: #3498db;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+form button:hover {
+  background-color: #2980b9;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/*UserInfo.css*/
+
+/* Style the overall container */
+.user-info-container {
+  display: flex;
+  flex-direction: row;
+ 
+  font-family: Arial, sans-serif;
+}
+
+/* Style the content area of the user info page */
+.user-info-content {
+  margin-left: 20px;
+  width: 100%;
+}
+
+/* Style for test stats section */
+.test-stats-container {
+  margin-top: 20px;
+}
+
+/* Large clickable box containers for test stats */
+.test-box {
+  background-color: #f0f0f0; /* Light gray background */
+  padding: 30px; /* Large padding to make the box bigger */
+  margin-bottom: 20px; /* Space between the boxes */
+  text-align: center;
+  font-size: 1.5rem; /* Large font size */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  cursor: pointer; /* Show pointer cursor */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effect */
+}
+
+/* Hover effect to make it interactive */
+.test-box:hover {
+  background-color: #dcdcdc; /* Darker gray on hover */
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+/* Ensures text is bold inside the boxes */
+.test-box strong {
+  font-weight: bold;
+}
+
+/* Loading and error states */
+div {
+  font-size: 1.25rem;
+ 
+}
+
+/*Analytics.jsx*/
+.analytics-container {
+  display: flex;
+}
+
+.analytics-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.analytics-boxes {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.analytics-box {
+  flex: 1;
+  background-color: #f0f0f0;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.analytics-box:hover {
+  transform: scale(1.05);
+}
+
+.code-editor-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.code-editor-btn:hover {
+  background-color: #0056b3;
+}
+
+
+/*Code Editor*/
+.code-space-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.editor-section {
+  width: 60%;
+  margin-right: 20px;
+}
+
+.io-section {
+  width: 35%;
+}
+
+.input-section,
+.output-section {
+  margin-bottom: 20px;
+}
+
+.input-box,
+.output-box {
+  width: 100%;
+  height: 200px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #282c34;
+  color: #ffffff;
+}
+
+.run-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #61dafb;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.run-button:hover {
+  background-color: #21a1f1;
+}
+
+.output-box {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  overflow-y: auto;
+}
+
+.attended-tests-container {
+  display: flex;
+}
+
+.attended-tests-content {
+  width: 80%;
+  margin-left: 20%;
+  padding: 20px;
+}
+
+.attended-tests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attended-tests-table th,
+.attended-tests-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.attended-tests-table th {
+  background-color: #f2f2f2;
+}
+
+.status-dropdown {
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.edit-status-btn,
+.save-status-btn,
+.view-code-btn {
+  padding: 8px 12px;
+  margin: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.edit-status-btn:hover,
+.save-status-btn:hover,
+.view-code-btn:hover {
+  background-color: #45a049;
+}
+
+.edit-status-btn {
+  background-color: #007BFF;
+}
+
+.edit-status-btn:hover {
+  background-color: #0056b3;
+}
+

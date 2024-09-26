@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../App.css';
+import '../../App.css';
+
 
 const Attended = ({ userId }) => {
   const [attendedTests, setAttendedTests] = useState([]);
@@ -34,8 +35,8 @@ const Attended = ({ userId }) => {
         <div className="tests-grid">
           {attendedTests.map((test) => (
             <div key={test._id} className="test-box">
-              <h3>{test.topic}</h3>
-              <p>Test ID: {test.topicId}</p>
+              <h3>{test.topicName}</h3>
+            
               <p>Attended:Yes</p>
               <p>Status: {test.testStatus ? 'Completed' : 'Incomplete'}</p>
             </div>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../App.css';
+import '../../App.css';
 
-const AdminPostedQuestions = ({userId}) => {
+const  AdminPostedQuestions = ({userId}) => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -41,7 +41,8 @@ const AdminPostedQuestions = ({userId}) => {
     }
   };
    const handleTestClick = (customId) => {
-    navigate(`/posted/${customId}/questions/${userId}`);
+    console.log(customId)
+    navigate(`/posted/${customId}/questions`);
   };
 
   return (
@@ -54,7 +55,7 @@ const AdminPostedQuestions = ({userId}) => {
       ) : (
         <div className="tests-grid">
           {tests.map(test => (
-             <div key={test._id} className="test-box" onClick={() => handleTestClick(test.customId)}>
+             <div key={test._id} className="test-box" onClick={() => handleTestClick(test._id)}>
               <h3>{test.topic}</h3>
               <p>Test ID: {test.customId}</p>
               <button onClick={() => handleDelete(test._id)}>Delete</button>

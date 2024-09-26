@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import UserSideBar from './UserSideBar';
-import AdminSideBar from './AdminSideBar';
+import UserSideBar from './User/UserSideBar';
+import AdminSideBar from './Admin/AdminSideBar';
 
 const ProtectedRoute = ({ element: Component, ...rest }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // Start with null to indicate loading

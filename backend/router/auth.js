@@ -16,7 +16,8 @@ router.get('/api/auth/status', (req, res) => {
   if (req.isAuthenticated()) {
     res.json({
       isAuthenticated: true,
-      userId: req.user._id // Include the user ID in the response
+      userId: req.user._id, // Include the user ID in the response
+      role:req.user.role
     });
   } else {
     res.json({ isAuthenticated: false });

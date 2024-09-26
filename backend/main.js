@@ -45,8 +45,12 @@ app.use(passport.session());
 
 
 
-app.use(require('./router/route'))
+
 app.use(require('./router/auth'))
+app.use(require('./router/adminRoutes'))
+app.use(require('./router/commonRoute'))
+app.use(require('./router/codeRunner'))
+app.use(require('./router/userRoutes'))
 
 
 app.listen(5000, () => console.log('Listening on port 5000'));

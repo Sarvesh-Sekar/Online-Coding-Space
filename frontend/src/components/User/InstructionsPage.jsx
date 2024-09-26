@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../App.css';
+import '../../App.css';
 
 const InstructionsPage = () => {
   const { customId, userId } = useParams();
@@ -15,6 +15,7 @@ const InstructionsPage = () => {
   useEffect(() => {
     const fetchTestDetails = async () => {
       try {
+        console.log(customId)
         const response = await axios.get(`http://localhost:5000/api/tests/${customId}`);
         setTopic(response.data.topic);
         setNumQuestions(response.data.numQuestions);

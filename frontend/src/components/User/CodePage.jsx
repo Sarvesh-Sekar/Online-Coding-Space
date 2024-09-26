@@ -7,12 +7,14 @@ import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { oneDark } from '@codemirror/theme-one-dark';
-import '../App.css';
+import '../../App.css';
 
 function CodeSpace() {
   const { customId, userId } = useParams();
   const navigate = useNavigate();
   const [language, setLanguage] = useState('.js');
+  const [questionName , setquestionName] = useState('')
+  const [topicName , setTopicName] = useState('')
   const [output, setOutput] = useState('');
   const [fileName, setFileName] = useState('');
   const [input, setInput] = useState('');
@@ -28,6 +30,7 @@ function CodeSpace() {
   const [canProceedToNext, setCanProceedToNext] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
 
+  
   useEffect(() => {
     const fetchQuestionDetails = async () => {
       const storedQuestion = localStorage.getItem('currentQuestion');
@@ -42,6 +45,7 @@ function CodeSpace() {
 
     const fetchTimer = async () => {
       try {
+        console.log(customId)
         const response = await axios.get(`http://localhost:5000/time/tests/${customId}`);
         const { toTime } = response.data;
         if (toTime) {
@@ -53,6 +57,7 @@ function CodeSpace() {
         console.error('Error fetching timer:', error);
       }
     };
+    console.log(customId)
 
     fetchQuestionDetails();
     fetchTimer();
@@ -94,8 +99,8 @@ function CodeSpace() {
       const response = await axios.get(`http://localhost:5000/api/tests/${customId}/questions/random`, {
         params: { excludedId },
       });
-      const { questionId, title, description, sampleTestCase, numberOfTestCases } = response.data;
-
+      const { questionId, title, description, sampleTestCase, numberOfTestCases, topicName } = response.data;
+  
       const newProblemDetails = {
         questionId,
         title,
@@ -103,15 +108,17 @@ function CodeSpace() {
         sampleTestCase,
         numberOfTestCases
       };
-
+  
       setProblemDetails(newProblemDetails);
+      setquestionName(title); // Set question name
+      setTopicName(topicName); // Set topic name
       setTestCaseStatus(Array(numberOfTestCases).fill('Not Passed'));
-
       localStorage.setItem('currentQuestion', JSON.stringify(newProblemDetails));
     } catch (error) {
       console.error('Error fetching random question:', error);
     }
   };
+  
 
   const runCode = async () => {
     const currentCode = code[language];
@@ -141,13 +148,27 @@ function CodeSpace() {
   const handleInputChange = (event) => {
     setInput(event.target.value);
   };
-
   const handleCodeChange = (value) => {
     setCode(prevCode => ({
       ...prevCode,
-      [language]: value
+      [language]: value,
     }));
+  
+    // Store the updated code in localStorage
+    localStorage.setItem(`code-${language}`, value);
   };
+  
+  // Add a useEffect hook to load code from localStorage when component mounts
+  useEffect(() => {
+    // Retrieve the saved code from localStorage for the current language
+    const storedCode = localStorage.getItem(`code-${language}`);
+    if (storedCode) {
+      setCode(prevCode => ({
+        ...prevCode,
+        [language]: storedCode,
+      }));
+    }
+  }, [language]); 
 
   const handleSubmit = async () => {
     try {
@@ -172,46 +193,42 @@ function CodeSpace() {
   const handleFinish = async () => {
     const allTestCasesPassed = testCaseStatus.every(status => status === 'Passed');
   
-    // If not all test cases are passed
     if (!allTestCasesPassed) {
       const confirmation = window.confirm('Not all test cases are passed. Would you like to end the test and submit this question?');
-  
       if (confirmation) {
-        // Submit as incomplete and navigate to Attended
         try {
           await axios.post(`http://localhost:5000/finish/${userId}/${customId}/${problemDetails.questionId}`, {
             language,
             code: code[language],
             filename: fileName,
-            completed: false // Explicitly send that this question is not completed
+            completed: false, // Explicitly send that this question is not completed
+            questionName: problemDetails.title,
+            topicName: topicName // You can set the topic name somewhere else in your state management
           });
-  
-          // Directly navigate to the Attended page
           navigate(`/attended`);
         } catch (error) {
           console.error('Error submitting incomplete question:', error.response || error.message);
           alert('Error submitting incomplete question.');
         }
       }
-      return; // Stop further processing
+      return;
     }
   
-    // If all test cases passed
     try {
       const response = await axios.post(`http://localhost:5000/finish/${userId}/${customId}/${problemDetails.questionId}`, {
         language,
         code: code[language],
         filename: fileName,
-        completed: true // Send completion status as true
+        completed: true, // Send completion status as true
+        questionName: problemDetails.title,
+        topicName: topicName // Include the topic name
       });
   
       const { completed, nextQuestion } = response.data;
   
-      // If all required questions are completed, navigate to Attended
       if (completed) {
         navigate(`/attended`);
       } else if (nextQuestion) {
-        // Load the next question if there are still questions to complete
         setProblemDetails(nextQuestion);
         setTestCaseStatus(Array(nextQuestion.numberOfTestCases).fill('Not Passed'));
         localStorage.setItem('currentQuestion', JSON.stringify(nextQuestion));

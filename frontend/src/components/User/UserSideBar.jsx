@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../App.css';
+import '../../App.css';
 
 const UserSideBar = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -29,12 +29,13 @@ const UserSideBar = ({ onLogout }) => {
   return (
     <div className="sidebar">
       <ul>
-        <li><Link to="/home">Home</Link></li>
+        <li><Link to="/dashboard">Dashboard</Link></li>
         
         <li><Link to="/upcoming">Upcoming Tests</Link></li>
         
-        <li><Link to="/tests">OnGoing</Link></li> {/* New Link */}
+        <li><Link to="/tests">OnGoing</Link></li> 
         <li><Link to="/attended">Attended</Link></li>
+        <li><Link to="/update-details">Update Details</Link></li>
       </ul>
       <button onClick={handleLogout}>Logout</button>
     </div>
