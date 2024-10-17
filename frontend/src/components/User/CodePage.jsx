@@ -7,6 +7,8 @@ import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { EditorView } from "@codemirror/view";
+
 import '../../App.css';
 
 function CodeSpace() {
@@ -42,6 +44,7 @@ function CodeSpace() {
         await fetchRandomQuestion();
       }
     };
+    
 
     const fetchTimer = async () => {
       try {
@@ -240,8 +243,38 @@ function CodeSpace() {
   };
   
   
+  // useEffect(() => {
+  //   // Disable right-click context menu
+  //   const disableRightClick = (e) => {
+  //     e.preventDefault();
+  //   };
+
+  //   // Disable common shortcuts for opening dev tools
+  //   const disableDevToolsShortcuts = (e) => {
+  //     if (
+  //       (e.ctrlKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+  //       e.key === 'F12' ||
+  //       (e.ctrlKey && e.key === 'U')
+  //     ) {
+  //       e.preventDefault();
+  //     }
+  //   };
+
+  //   // Attach event listeners
+  //   document.addEventListener('contextmenu', disableRightClick);
+  //   document.addEventListener('keydown', disableDevToolsShortcuts);
+
+  //   // Cleanup event listeners on component unmount
+  //   return () => {
+  //     document.removeEventListener('contextmenu', disableRightClick);
+  //     document.removeEventListener('keydown', disableDevToolsShortcuts);
+  //   };
+  // }, []);
   
-  
+  const handlePaste = (e) => {
+    e.preventDefault();
+    alert("Pasting is not allowed!");
+  };
 
   const languageMode = {
     '.js': javascript(),
@@ -302,9 +335,15 @@ function CodeSpace() {
           <CodeMirror
             value={code[language]}
             height="200px"
-            extensions={[languageMode[language]]}
+             extensions={[
+              languageMode[language],
+              EditorView.domEventHandlers({
+                paste: handlePaste,
+              }),
+            ]}
             theme={oneDark}
             onChange={handleCodeChange}
+            
           />
         </div>
         <div>
