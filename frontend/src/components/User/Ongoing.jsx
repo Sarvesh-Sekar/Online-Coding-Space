@@ -13,28 +13,12 @@ const Ongoing = ({ userId }) => {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        // Fetch the user's history
-        const historyResponse = await axios.get(`http://localhost:5000/history/${userId}`);
-        setAttendedTests(historyResponse.data);
-
-        // If the user has attended tests, don't show any tests
-        if (historyResponse.data.length > 0) {
-          setTests([]); // No tests to show
-        } else {
-          // If no history, fetch available tests
-          const testsResponse = await axios.get('http://localhost:5000/api/tests');
-          const currentTime = new Date();
-
-          // Filter tests based on the current time
-          const filteredTests = testsResponse.data.filter(test => {
-            const fromTime = new Date(test.fromTime);
-            const toTime = new Date(test.toTime);
-
-            return (!fromTime || !toTime || (currentTime >= fromTime && currentTime <= toTime));
-          });
-
-          setTests(filteredTests);
-        }
+        setLoading(true);
+  
+        // Fetch unmatched tests directly from the updated route
+        const testsResponse = await axios.get(`http://localhost:5000/api/tests/${userId}`);
+  
+        setTests(testsResponse.data); // Set the filtered tests
       } catch (err) {
         console.error('Error fetching data:', err.response || err.message);
         setError('Error fetching data');
@@ -42,9 +26,11 @@ const Ongoing = ({ userId }) => {
         setLoading(false);
       }
     };
-
+  
     fetchTests();
   }, [userId]);
+  
+  
 
   // Update handleTestClick to navigate using test._id
   const handleTestClick = (testId) => {
