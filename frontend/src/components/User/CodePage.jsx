@@ -209,6 +209,8 @@ function CodeSpace() {
             topicName: topicName // You can set the topic name somewhere else in your state management
           });
           navigate(`/attended`);
+          localStorage.removeItem('currentQuestion'); // Clear localStorag
+          localStorage.removeItem(`code-${language}`);
         } catch (error) {
           console.error('Error submitting incomplete question:', error.response || error.message);
           alert('Error submitting incomplete question.');
