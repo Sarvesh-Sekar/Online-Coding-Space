@@ -15,19 +15,34 @@ const runSource = require('compile-run')
 const History = require('../model/History');
 
 
-router.get('/api/tests', async (req, res) => {
-    try {
-      const tests = await Test.find();
-     
-      if (tests.length > 0) {
-        res.json(tests);
-      } else {
-        res.status(404).json({ message: 'No tests found' });
-      }
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching tests', error });
-    }
-  });
+router.get('/api/tests/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Fetch the user's test history
+    const userHistory = await History.find({ userId }, 'topicId');
+    const attendedTopicIds = userHistory.map(history => history.topicId);
+
+    // Fetch all available tests
+    const tests = await Test.find().lean();
+
+    // Process and filter unmatched tests
+    const unmatchedTests = tests
+      .map(test => ({
+        ...test,
+        _id: test._id.toString(), // Convert _id to string for comparison
+      }))
+      .filter(test => !attendedTopicIds.includes(test._id));
+
+    console.log(unmatchedTests); // Debug the filtered tests
+    res.json(unmatchedTests);
+  } catch (error) {
+    console.error('Error fetching tests:', error);
+    res.status(500).json({ message: 'Error fetching tests', error });
+  }
+});
+
+
   
   router.get('/view-submissions/:testId', async (req, res) => {
     const { testId } = req.params;
@@ -75,24 +90,18 @@ router.get('/api/tests', async (req, res) => {
   router.get('/history/:userId', async (req, res) => {
     try {
       const { userId } = req.params;
-      console.log(userId)
   
       // Fetch the test history for the given user ID
-      const userHistory = await History.find({ userId });
-      
+      const userHistory = await History.find({ userId }, 'topicId'); // Fetch only topicId
+      const topicIds = userHistory.map(history => history.topicId); // Extract topicId array
   
-      // If no history is found, return an empty array
-      if (!userHistory || userHistory.length === 0) {
-        return res.status(200).json([]);
-      }
-  
-      // Return the user's test history
-      res.status(200).json(userHistory);
+      res.status(200).json(topicIds); // Return topic IDs as the response
     } catch (err) {
       console.error('Error fetching user history:', err);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+  
   
   router.get('/history-attended/:userId', async (req, res) => {
     const { userId } = req.params;
